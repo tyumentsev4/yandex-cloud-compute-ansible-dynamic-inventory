@@ -62,20 +62,20 @@ class Inventory:
 class YandexCloudProvider:
     def __init__(self):
         self.iam_token = (
-            os.getenv("YC_TOKEN")
-            if os.getenv("YC_TOKEN")
-            else os.getenv("TF_VAR_yc_iam_token")
+            os.getenv("TF_VAR_yc_iam_token")
+            if os.getenv("TF_VAR_yc_iam_token")
+            else os.getenv("YC_TOKEN")
         )
         self.folder_id = (
-            os.getenv("YC_FOLDER_ID")
-            if os.getenv("YC_FOLDER_ID")
-            else os.getenv("TF_VAR_yc_folder_id")
+            os.getenv("TF_VAR_yc_folder_id")
+            if os.getenv("TF_VAR_yc_folder_id")
+            else os.getenv("YC_FOLDER_ID")
         )
         if self.iam_token is None:
-            print("Please set YC_TOKEN variable")
+            print("Please set TF_VAR_yc_iam_token variable. `export TF_VAR_yc_iam_token=$(yc iam create-token)`")
             sys.exit(1)
         if self.folder_id is None:
-            print("Please set YC_FOLER_ID variable")
+            print("Please set TF_VAR_yc_folder_id variable. `export TF_VAR_yc_folder_id=$(yc config get folder-id)`")
             sys.exit(1)
         self.yandex_sdk = yandexcloud.SDK(iam_token=self.iam_token)
 
@@ -97,12 +97,12 @@ class YandexCloudProvider:
     @staticmethod
     def _instance_to_host(instance) -> Host:
         return Host(
-            name=instance.name,
+            name=instance.name.replace("-", "_"),
             fqdn=instance.fqdn,
             ip_address=instance.network_interfaces[
                 0
             ].primary_v4_address.one_to_one_nat.address,
-            labels=dict(instance.labels),
+            labels={key: value.replace("-", "_") for key, value in instance.labels.items()},
             zone=instance.zone_id.replace("-", "_"),
         )
 
