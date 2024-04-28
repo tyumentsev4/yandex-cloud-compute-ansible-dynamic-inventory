@@ -5,7 +5,7 @@ import os
 import sys
 from dataclasses import dataclass
 
-import yandexcloud
+from yandexcloud import SDK
 from yandex.cloud.compute.v1.instance_service_pb2 import ListInstancesRequest
 from yandex.cloud.compute.v1.instance_service_pb2_grpc import InstanceServiceStub
 from yandex.cloud.compute.v1.zone_service_pb2 import ListZonesRequest
@@ -77,7 +77,7 @@ class YandexCloudProvider:
         if self.folder_id is None:
             print("Please set TF_VAR_yc_folder_id variable. `export TF_VAR_yc_folder_id=$(yc config get folder-id)`")
             sys.exit(1)
-        self.yandex_sdk = yandexcloud.SDK(iam_token=self.iam_token)
+        self.yandex_sdk = SDK(iam_token=self.iam_token)
 
     def _get_instances(self) -> list:
         return (
